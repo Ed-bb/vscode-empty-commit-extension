@@ -1,2 +1,19 @@
-// Placeholder for Command Definition (.vsct file)
-<!-- This XML contains menu and command definitions -->
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+  <Commands>
+    <Groups>
+      <Group guid="824b05b3-d6df-4477-8b22-3df7b10c1dfd" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+      </Group>
+    </Groups>
+    <Buttons>
+      <Button guid="824b05b3-d6df-4477-8b22-3df7b10c1dfd" id="0x0100" priority="0x0100" type="Button">
+        <Parent guid="824b05b3-d6df-4477-8b22-3df7b10c1dfd" id="MyMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <CommandName>cmdCreateEmptyCommit</CommandName>
+          <ButtonText>Create Empty Git Commit</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+</CommandTable>
