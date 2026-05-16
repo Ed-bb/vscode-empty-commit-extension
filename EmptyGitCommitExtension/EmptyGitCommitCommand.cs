@@ -30,48 +30,9 @@ namespace EmptyGitCommitExtension
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            string gitCommand = "git commit --allow-empty -m \"Empty Commit\"";
 
-            try
-            {
-                ExecuteGitCommand(gitCommand);
-                VsShellUtilities.ShowMessageBox(
-                    this.package,
-                    "Empty Git Commit Created Successfully!",
-                    "Success",
-                    OLEMSGICON.OLEMSGICON_INFO,
-                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-            }
-            catch (Exception ex)
-            {
-                VsShellUtilities.ShowMessageBox(
-                    this.package,
-                    ex.Message,
-                    "Error",
-                    OLEMSGICON.OLEMSGICON_CRITICAL,
-                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-            }
-        }
-
-        private void ExecuteGitCommand(string command)
-        {
-            var info = new ProcessStartInfo("cmd.exe", "/c " + command)
-            {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-
-            using var process = Process.Start(info);
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                throw new Exception(process.StandardError.ReadToEnd());
-            }
+            string workspaceDirectory = "C:\\TEMP\\"; // Replace with dynamic workspace retrieval logic
+            EmptyCommitWorkflow.RunCommitWorkflow(package, workspaceDirectory);
         }
     }
 }
