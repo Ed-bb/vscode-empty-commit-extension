@@ -1,0 +1,41 @@
+{
+  "name": "vscode-empty-commit-extension",
+  "displayName": "Empty Commit Extension",
+  "description": "VS Code Extension for creating empty git commits with a single command.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": ">=1.75.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onCommand:empty-commit.create",
+    "onCommand:empty-commit.createQuick"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "empty-commit.create",
+        "title": "Create Empty Commit",
+        "category": "Git"
+      },
+      {
+        "command": "empty-commit.createQuick",
+        "title": "Create Empty Commit (Quick)",
+        "category": "Git"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "@types/node": "^16.0.0",
+    "typescript": "^4.7.0"
+  }
+}
