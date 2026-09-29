@@ -9,7 +9,7 @@ async function getWorkspaceFolder(): Promise<vscode.WorkspaceFolder | null> {
   const folders = vscode.workspace.workspaceFolders;
 
   if (!folders || folders.length === 0) {
-    vscode.window.showErrorMessage('No workspace folder open');
+    vscode.window.showErrorMessage('No workspace folder open. Please open a folder first.');
     return null;
   }
 
@@ -41,7 +41,7 @@ function formatGitError(error: any): string {
   if (error.stderr) {
     const stderr = error.stderr.toString().trim();
     if (stderr.includes('not a git repository')) {
-      return 'Not a git repository. Run "Initialize Repository with Empty Commit" first.';
+      return 'Not a git repository. Initialize first using "Empty Commit: Initialize Repository"';
     }
     if (stderr.includes('fatal')) {
       return stderr.replace('fatal: ', '');
@@ -60,140 +60,204 @@ async function createEmptyCommit(cwd: string, message: string): Promise<void> {
   }
 }
 
-// Initialize a repository (git init + optional user config + empty commit)
-async function initializeRepository(cwd: string): Promise<void> {
-  try {
-    const isGit = await isGitRepository(cwd);
-
-    if (!isGit) {
-      // Initialize git repo
-      await execFileAsync('git', ['init'], { cwd });
-      vscode.window.showInformationMessage('✓ Git repository initialized');
-    }
-
-    // Ask if user wants to configure git user
-    const configure = await vscode.window.showQuickPick(['Yes', 'No'], {
-      placeHolder: 'Configure git user (name/email) before creating commit?'
-    });
-
-    if (configure === 'Yes') {
-      const userName = await vscode.window.showInputBox({
-        prompt: 'Enter git user name',
-        validateInput: (value) => (value.trim() ? '' : 'Name cannot be empty')
-      });
-
-      if (!userName) return;
-
-      const userEmail = await vscode.window.showInputBox({
-        prompt: 'Enter git user email',
-        validateInput: (value) =>
-          value.includes('@') ? '' : 'Please enter a valid email'
-      });
-
-      if (!userEmail) return;
-
-      try {
-        await execFileAsync('git', ['config', 'user.name', userName], { cwd });
-        await execFileAsync('git', ['config', 'user.email', userEmail], { cwd });
-        vscode.window.showInformationMessage('✓ Git user configured');
-      } catch (error: any) {
-        vscode.window.showErrorMessage(`Failed to configure git user: ${formatGitError(error)}`);
-        return;
-      }
-    }
-
-    // Create initial empty commit
-    const message = await vscode.window.showInputBox({
-      prompt: 'Enter initial commit message',
-      value: 'Initial commit',
-      validateInput: (value) => (value.trim() ? '' : 'Message cannot be empty')
-    });
-
-    if (!message) return;
-
-    await createEmptyCommit(cwd, message);
-    vscode.window.showInformationMessage(`✓ Repository initialized with commit: "${message}"`);
-  } catch (error: any) {
-    vscode.window.showErrorMessage(`Failed to initialize repository: ${error.message}`);
-  }
-}
-
 export function activate(context: vscode.ExtensionContext) {
-  // Command 1: Create empty commit with custom message
-  const createEmptyCommit_cmd = vscode.commands.registerCommand(
-    'empty-commit.create',
+  // Command 1: Quick empty commit - THE PRIMARY COMMAND FOR INITIALIZING REPOS
+  // This should be bound to Ctrl+Shift+E for fastest access
+  const quickEmptyCommit = vscode.commands.registerCommand(
+    'empty-commit.quick',
     async () => {
       try {
         const folder = await getWorkspaceFolder();
         if (!folder) return;
 
-        const isGit = await isGitRepository(folder.uri.fsPath);
+        const cwd = folder.uri.fsPath;
+        const isGit = await isGitRepository(cwd);
+
+        // If not a git repo, auto-initialize it
         if (!isGit) {
-          const init = await vscode.window.showQuickPick(['Initialize Now', 'Cancel'], {
-            placeHolder: 'Not a git repository. Initialize?'
-          });
-          if (init !== 'Initialize Now') return;
-          await initializeRepository(folder.uri.fsPath);
-          return;
+          try {
+            await execFileAsync('git', ['init'], { cwd });
+          } catch (error: any) {
+            vscode.window.showErrorMessage(`Failed to initialize git: ${formatGitError(error)}`);
+            return;
+          }
         }
 
+        // Create empty commit with default message
+        try {
+          await createEmptyCommit(cwd, 'Empty commit');
+          vscode.window.showInformationMessage('✓ Empty commit created');
+        } catch (error: any) {
+          vscode.window.showErrorMessage(`Failed to create commit: ${error.message}`);
+        }
+      } catch (error: any) {
+        vscode.window.showErrorMessage(`Operation failed: ${error.message}`);
+      }
+    }
+  );
+
+  // Command 2: Create empty commit with custom message
+  // For users who want to specify what the commit is for
+  const customEmptyCommit = vscode.commands.registerCommand(
+    'empty-commit.custom',
+    async () => {
+      try {
+        const folder = await getWorkspaceFolder();
+        if (!folder) return;
+
+        const cwd = folder.uri.fsPath;
+        const isGit = await isGitRepository(cwd);
+
+        // If not a git repo, offer to initialize
+        if (!isGit) {
+          const action = await vscode.window.showQuickPick(
+            [
+              { label: 'Initialize Repository', description: 'Create git repo and commit' },
+              { label: 'Cancel', description: 'Do nothing' }
+            ],
+            { placeHolder: 'Not a git repository' }
+          );
+
+          if (action?.label !== 'Initialize Repository') return;
+
+          try {
+            await execFileAsync('git', ['init'], { cwd });
+          } catch (error: any) {
+            vscode.window.showErrorMessage(`Failed to initialize git: ${formatGitError(error)}`);
+            return;
+          }
+        }
+
+        // Prompt for commit message
         const message = await vscode.window.showInputBox({
-          prompt: 'Enter commit message',
+          prompt: 'Commit message for empty commit',
           value: 'Empty commit',
-          validateInput: (value) => (value.trim() ? '' : 'Message cannot be empty')
+          placeHolder: 'e.g., "chore: initialize repo" or "init: setup"',
+          validateInput: (value) => {
+            if (!value.trim()) {
+              return 'Message cannot be empty';
+            }
+            return '';
+          }
         });
 
         if (!message) return;
 
-        const cwd = folder.uri.fsPath;
-        await createEmptyCommit(cwd, message);
-        vscode.window.showInformationMessage(`✓ Empty commit created: "${message}"`);
+        try {
+          await createEmptyCommit(cwd, message);
+          vscode.window.showInformationMessage(`✓ Commit created: "${message}"`);
+        } catch (error: any) {
+          vscode.window.showErrorMessage(`Failed to create commit: ${error.message}`);
+        }
       } catch (error: any) {
-        vscode.window.showErrorMessage(`Failed to create commit: ${error.message}`);
+        vscode.window.showErrorMessage(`Operation failed: ${error.message}`);
       }
     }
   );
 
-  // Command 2: Create empty commit with default message
-  const createWithoutPrompt = vscode.commands.registerCommand(
-    'empty-commit.createQuick',
+  // Command 3: Initialize repository and create initial commit
+  // For users who want to set git config before creating the first commit
+  const initRepository = vscode.commands.registerCommand(
+    'empty-commit.init',
     async () => {
       try {
         const folder = await getWorkspaceFolder();
         if (!folder) return;
 
-        const isGit = await isGitRepository(folder.uri.fsPath);
+        const cwd = folder.uri.fsPath;
+        const isGit = await isGitRepository(cwd);
+
+        // Initialize git if needed
         if (!isGit) {
-          const init = await vscode.window.showQuickPick(['Initialize Now', 'Cancel'], {
-            placeHolder: 'Not a git repository. Initialize?'
-          });
-          if (init !== 'Initialize Now') return;
-          await initializeRepository(folder.uri.fsPath);
-          return;
+          try {
+            await execFileAsync('git', ['init'], { cwd });
+            vscode.window.showInformationMessage('✓ Git repository initialized');
+          } catch (error: any) {
+            vscode.window.showErrorMessage(`Failed to initialize git: ${formatGitError(error)}`);
+            return;
+          }
         }
 
-        const cwd = folder.uri.fsPath;
-        await createEmptyCommit(cwd, 'Empty commit');
-        vscode.window.showInformationMessage('✓ Empty commit created');
+        // Ask if user wants to configure git user
+        const configGit = await vscode.window.showQuickPick(
+          [
+            { label: 'Yes', description: 'Set git user name and email' },
+            { label: 'No', description: 'Skip configuration' }
+          ],
+          {
+            placeHolder: 'Configure git user (name/email)?',
+            canPickMany: false
+          }
+        );
+
+        if (configGit?.label === 'Yes') {
+          const userName = await vscode.window.showInputBox({
+            prompt: 'Git user name',
+            placeHolder: 'e.g., John Doe',
+            validateInput: (value) => {
+              if (!value.trim()) {
+                return 'Name cannot be empty';
+              }
+              return '';
+            }
+          });
+
+          if (!userName) return;
+
+          const userEmail = await vscode.window.showInputBox({
+            prompt: 'Git user email',
+            placeHolder: 'e.g., john@example.com',
+            validateInput: (value) => {
+              if (!value.trim()) {
+                return 'Email cannot be empty';
+              }
+              if (!value.includes('@')) {
+                return 'Please enter a valid email';
+              }
+              return '';
+            }
+          });
+
+          if (!userEmail) return;
+
+          try {
+            await execFileAsync('git', ['config', 'user.name', userName], { cwd });
+            await execFileAsync('git', ['config', 'user.email', userEmail], { cwd });
+            vscode.window.showInformationMessage('✓ Git user configured');
+          } catch (error: any) {
+            vscode.window.showErrorMessage(`Failed to configure git: ${formatGitError(error)}`);
+            return;
+          }
+        }
+
+        // Create initial commit
+        const message = await vscode.window.showInputBox({
+          prompt: 'Initial commit message',
+          value: 'Initial commit',
+          placeHolder: 'e.g., "Initial commit" or "chore: setup"',
+          validateInput: (value) => {
+            if (!value.trim()) {
+              return 'Message cannot be empty';
+            }
+            return '';
+          }
+        });
+
+        if (!message) return;
+
+        try {
+          await createEmptyCommit(cwd, message);
+          vscode.window.showInformationMessage(`✓ Repository initialized with commit: "${message}"`);
+        } catch (error: any) {
+          vscode.window.showErrorMessage(`Failed to create commit: ${error.message}`);
+        }
       } catch (error: any) {
-        vscode.window.showErrorMessage(`Failed to create commit: ${error.message}`);
+        vscode.window.showErrorMessage(`Operation failed: ${error.message}`);
       }
     }
   );
 
-  // Command 3: Initialize repository with empty commit
-  const initRepo = vscode.commands.registerCommand('empty-commit.initRepo', async () => {
-    try {
-      const folder = await getWorkspaceFolder();
-      if (!folder) return;
-
-      await initializeRepository(folder.uri.fsPath);
-    } catch (error: any) {
-      vscode.window.showErrorMessage(`Failed to initialize repository: ${error.message}`);
-    }
-  });
-
-  context.subscriptions.push(createEmptyCommit_cmd, createWithoutPrompt, initRepo);
+  context.subscriptions.push(quickEmptyCommit, customEmptyCommit, initRepository);
 }
 
 export function deactivate() {}
