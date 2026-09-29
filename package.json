@@ -1,7 +1,7 @@
 {
   "name": "vscode-empty-commit-extension",
-  "displayName": "Empty Commit Extension",
-  "description": "VS Code Extension for creating empty git commits. Perfect for initializing repositories, branches, and triggering CI/CD pipelines without code changes.",
+  "displayName": "Empty Commit",
+  "description": "One-click initialization of repositories with empty commits. Perfect for post-fork setup.",
   "version": "0.1.0",
   "author": "Ed-bb",
   "license": "MIT",
@@ -9,50 +9,59 @@
     "vscode": ">=1.75.0"
   },
   "categories": ["SCM Providers"],
-  "keywords": ["git", "empty commit", "initialize", "repository"],
+  "keywords": ["git", "empty commit", "initialize", "repository", "fork"],
   "repository": {
     "type": "git",
     "url": "https://github.com/Ed-bb/vscode-empty-commit-extension"
   },
   "activationEvents": [
-    "onCommand:empty-commit.create",
-    "onCommand:empty-commit.createQuick",
-    "onCommand:empty-commit.initRepo"
+    "onCommand:empty-commit.quick",
+    "onCommand:empty-commit.custom",
+    "onCommand:empty-commit.init"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "empty-commit.create",
-        "title": "Create Empty Commit",
-        "category": "Git",
+        "command": "empty-commit.quick",
+        "title": "Quick Empty Commit",
+        "category": "Empty Commit",
+        "description": "Create an empty commit instantly (auto-initializes repo if needed)"
+      },
+      {
+        "command": "empty-commit.custom",
+        "title": "Create Empty Commit with Message",
+        "category": "Empty Commit",
         "description": "Create an empty commit with a custom message"
       },
       {
-        "command": "empty-commit.createQuick",
-        "title": "Create Empty Commit (Quick)",
-        "category": "Git",
-        "description": "Create an empty commit with default message"
-      },
-      {
-        "command": "empty-commit.initRepo",
-        "title": "Initialize Repository with Empty Commit",
-        "category": "Git",
-        "description": "Initialize a new git repository and create an initial empty commit"
+        "command": "empty-commit.init",
+        "title": "Initialize Repository",
+        "category": "Empty Commit",
+        "description": "Initialize repository with optional git config and create first commit"
       }
     ],
     "keybindings": [
       {
-        "command": "empty-commit.createQuick",
+        "command": "empty-commit.quick",
         "key": "ctrl+shift+e",
         "mac": "cmd+shift+e",
-        "when": "explorerViewletFocus"
+        "when": "explorerViewletFocus",
+        "description": "Quick empty commit (fastest way to initialize)"
       },
       {
-        "command": "empty-commit.create",
+        "command": "empty-commit.custom",
+        "key": "ctrl+alt+e",
+        "mac": "cmd+alt+e",
+        "when": "explorerViewletFocus",
+        "description": "Create empty commit with custom message"
+      },
+      {
+        "command": "empty-commit.init",
         "key": "ctrl+shift+alt+e",
         "mac": "cmd+shift+alt+e",
-        "when": "explorerViewletFocus"
+        "when": "explorerViewletFocus",
+        "description": "Initialize repository with git config"
       }
     ]
   },
