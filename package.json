@@ -1,15 +1,23 @@
 {
   "name": "vscode-empty-commit-extension",
   "displayName": "Empty Commit Extension",
-  "description": "VS Code Extension for creating empty git commits with a single command.",
-  "version": "0.0.1",
+  "description": "VS Code Extension for creating empty git commits. Perfect for initializing repositories, branches, and triggering CI/CD pipelines without code changes.",
+  "version": "0.1.0",
+  "author": "Ed-bb",
+  "license": "MIT",
   "engines": {
     "vscode": ">=1.75.0"
   },
-  "categories": ["Other"],
+  "categories": ["SCM Providers"],
+  "keywords": ["git", "empty commit", "initialize", "repository"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ed-bb/vscode-empty-commit-extension"
+  },
   "activationEvents": [
     "onCommand:empty-commit.create",
-    "onCommand:empty-commit.createQuick"
+    "onCommand:empty-commit.createQuick",
+    "onCommand:empty-commit.initRepo"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -17,12 +25,34 @@
       {
         "command": "empty-commit.create",
         "title": "Create Empty Commit",
-        "category": "Git"
+        "category": "Git",
+        "description": "Create an empty commit with a custom message"
       },
       {
         "command": "empty-commit.createQuick",
         "title": "Create Empty Commit (Quick)",
-        "category": "Git"
+        "category": "Git",
+        "description": "Create an empty commit with default message"
+      },
+      {
+        "command": "empty-commit.initRepo",
+        "title": "Initialize Repository with Empty Commit",
+        "category": "Git",
+        "description": "Initialize a new git repository and create an initial empty commit"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "empty-commit.createQuick",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "explorerViewletFocus"
+      },
+      {
+        "command": "empty-commit.create",
+        "key": "ctrl+shift+alt+e",
+        "mac": "cmd+shift+alt+e",
+        "when": "explorerViewletFocus"
       }
     ]
   },
@@ -31,11 +61,15 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts",
+    "lint:fix": "eslint src --ext ts --fix"
   },
   "devDependencies": {
-    "@types/vscode": "^1.75.0",
     "@types/node": "^16.0.0",
+    "@types/vscode": "^1.75.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "eslint": "^8.40.0",
     "typescript": "^4.7.0"
   }
 }
