@@ -1,156 +1,120 @@
-# VS Code Empty Commit Extension
+# Empty Commit
 
-A lightweight VS Code extension that simplifies creating empty git commits. Perfect for initializing repositories, branches, and triggering CI/CD pipelines without code changes.
+A lightning-fast VS Code extension for initializing repositories with empty commits. **One keystroke after forking a repo = instant setup.**
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-## ✨ Features
+## 🎯 Perfect For
 
-- **Create Empty Commit** — Prompts for a custom commit message and creates an empty commit
-- **Create Empty Commit (Quick)** — Instantly creates an empty commit with the message "Empty commit"
-- **Initialize Repository** — Initialize a new git repository with optional user configuration and an initial empty commit
-- **Multi-folder Support** — Choose which workspace folder to commit to when multiple folders are open
-- **Smart Validation** — Validates git repository status and prevents empty commit messages
+- **Just forked a repo?** Press `Ctrl+Shift+E` to initialize it instantly
+- **Created a new branch?** Quick empty commit to establish it
+- **Triggering CI/CD?** Create a commit without code changes
 
-## 🚀 Quick Start
+## ⚡ Quick Start (30 seconds)
 
-### Installation
+1. Install from VS Code Extensions (`Ctrl+Shift+X`)
+2. Open your project folder
+3. Press `Ctrl+Shift+E` (or `Cmd+Shift+E` on Mac)
+4. Done! ✓
 
-1. Open VS Code
-2. Go to Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-3. Search for "Empty Commit Extension"
-4. Click **Install**
+That's it. No git setup needed. No config dialogs. Just one shortcut.
 
-Or install from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/) (when published)
+## ✨ Three Simple Commands
 
-### Basic Usage
+### 1. **Quick Empty Commit** (`Ctrl+Shift+E`)
+The fastest way to initialize. Creates a commit called "Empty commit" instantly.
+- Auto-initializes git if needed
+- No prompts, no delays
+- Perfect for post-fork setup
 
-1. Open a workspace folder that is a git repository
-2. Press `Ctrl+Shift+P` (or `Cmd+Shift+P`) to open the Command Palette
-3. Run one of these commands:
-   - **`Create Empty Commit`** — Create with custom message
-   - **`Create Empty Commit (Quick)`** — Create with default message
-   - **`Initialize Repository with Empty Commit`** — Set up a new repo
+### 2. **Custom Message** (`Ctrl+Alt+E`)
+Same as Quick, but lets you name your commit.
+- Type your message
+- Creates the commit
+- One-step workflow
+
+### 3. **Initialize Repository** (`Ctrl+Shift+Alt+E`)
+Full setup with optional git user configuration.
+- Initializes git
+- (Optional) Set your name/email
+- Creates first commit with your message
 
 ## ⌨️ Keyboard Shortcuts
 
-| Action | Windows/Linux | macOS |
-|--------|---------------|-------|
-| Quick empty commit | `Ctrl+Shift+E` | `Cmd+Shift+E` |
-| Custom message commit | `Ctrl+Shift+Alt+E` | `Cmd+Shift+Alt+E` |
+| Use Case | Shortcut (Windows/Linux) | Shortcut (Mac) |
+|----------|--------------------------|----------------|
+| Fastest initialization | `Ctrl+Shift+E` | `Cmd+Shift+E` |
+| With custom message | `Ctrl+Alt+E` | `Cmd+Alt+E` |
+| Full setup (with config) | `Ctrl+Shift+Alt+E` | `Cmd+Shift+Alt+E` |
 
-*Note: Shortcuts work when the Explorer view is focused*
+*Note: Use shortcuts in Explorer view (File view) for fastest access*
 
-## 💡 Use Cases
+Or use Command Palette (`Ctrl+Shift+P`):
+- `Empty Commit: Quick Empty Commit`
+- `Empty Commit: Create Empty Commit with Message`
+- `Empty Commit: Initialize Repository`
 
-### Initialize a New Repository
+## 💡 Common Workflows
 
-```bash
-# Without this extension, you'd need:
-git init
-git config user.name "Your Name"
-git config user.email "your.email@example.com"
-git commit --allow-empty -m "Initial commit"
+### Post-Fork Initialization
+```
+1. Fork repo on GitHub
+2. Clone it locally
+3. Open folder in VS Code
+4. Press Ctrl+Shift+E
+5. Your repo is initialized! ✓
 ```
 
-**With this extension:** Run "Initialize Repository with Empty Commit" and follow the prompts!
-
-### Trigger CI/CD Without Code Changes
-
-Many CI/CD pipelines are triggered by git commits. Use this extension to:
-- Trigger GitHub Actions workflows
-- Run GitLab CI pipelines
-- Deploy without code modifications
-
-Simply create an empty commit with a meaningful message:
+### CI/CD Pipeline Trigger
+Create empty commit to run GitHub Actions or GitLab CI without code changes:
 ```
-git commit --allow-empty -m "chore: trigger CI/CD pipeline"
+Ctrl+Alt+E → Type "chore: trigger CI/CD" → Enter
 ```
 
-### Initialize Feature Branches
-
-```bash
-git checkout -b feature/my-feature
-# Create an empty commit to establish the branch
-git commit --allow-empty -m "init: feature/my-feature"
+### Initialize Feature Branch
+```
+git checkout -b feature/new-feature
+Ctrl+Shift+E  # Creates initial commit on new branch
 ```
 
-## 🔧 Commands
+## 🚀 Features
 
-| Command | ID | Description |
-|---------|----|--------------|
-| Create Empty Commit | `empty-commit.create` | Prompts for message, creates empty commit |
-| Create Empty Commit (Quick) | `empty-commit.createQuick` | Creates with message "Empty commit" |
-| Initialize Repository | `empty-commit.initRepo` | Initializes git repo with optional user config |
+- **Auto-initializes git** - If folder isn't a git repo yet, we set it up
+- **Zero config** - Works out of the box, no setup needed
+- **Smart defaults** - Quick shortcut for fastest use
+- **Optional customization** - Add git config when you want
+- **Multi-folder support** - Works with monorepos and multi-root workspaces
+- **Secure** - No shell injection vulnerabilities
+- **Cross-platform** - Windows, Mac, Linux supported
 
 ## 📋 Requirements
 
 - VS Code 1.75.0 or higher
-- Git must be installed and available in your system PATH
-- A workspace folder to work with
-
-## ⚙️ How It Works
-
-This extension runs the equivalent of:
-
-```bash
-git commit --allow-empty -m "Your message"
-```
-
-For repository initialization, it also supports:
-
-```bash
-git init
-git config user.name "Name"
-git config user.email "email@example.com"
-```
+- Git installed and in PATH
+- An open folder in VS Code
 
 ## 🐛 Troubleshooting
 
-### "No workspace folder open"
+### It didn't work / git not found
 
-**Problem:** Extension shows this error message
+**Solution:** Make sure git is installed and in your PATH
+- **Windows:** Install [Git for Windows](https://git-scm.com/download/win)
+- **Mac:** `brew install git`
+- **Linux:** `sudo apt-get install git`
 
-**Solution:** Open a folder in VS Code first (`File > Open Folder` or `Ctrl+K Ctrl+O`)
+Then restart VS Code.
 
-### "Not a git repository"
-
-**Problem:** You get this error when trying to create a commit
-
-**Solutions:**
-1. **Option A:** Use "Initialize Repository with Empty Commit" command to set up git
-2. **Option B:** Run `git init` in your terminal manually, then try again
-3. **Option C:** Open an existing git repository folder
-
-### Command not appearing in Command Palette
-
-**Problem:** Commands don't show up in Command Palette
+### Shortcut doesn't work
 
 **Solutions:**
-- Ensure the folder is a git repository (or use Initialize command first)
-- Try reloading VS Code (`Ctrl+Shift+P` → "Reload Window")
-- Check that the extension is enabled in Extensions view
+1. Click on Explorer/File view first (Explorer must be focused)
+2. Try reloading VS Code (`Ctrl+Shift+P` → "Reload Window")
+3. Check Extensions view - make sure extension is enabled
 
-### Git command not found
+### Command Palette shows no commands
 
-**Problem:** You see "git is not recognized" or "git: command not found"
-
-**Solutions:**
-1. **Windows:** Install [Git for Windows](https://git-scm.com/download/win)
-2. **macOS:** Install via Homebrew: `brew install git`
-3. **Linux:** `sudo apt-get install git` (Ubuntu/Debian) or equivalent for your distro
-4. Ensure git is in your system PATH
-5. Restart VS Code after installing git
-
-### Permission denied
-
-**Problem:** You see permission-related errors on macOS/Linux
-
-**Solution:** Check file permissions:
-```bash
-chmod 755 /path/to/your/repo
-```
+Reload VS Code: `Ctrl+Shift+P` → "Reload Window"
 
 ## 👨‍💻 Development
 
@@ -159,58 +123,52 @@ chmod 755 /path/to/your/repo
 npm run compile
 ```
 
-### Watch mode
+### Watch (auto-rebuild)
 ```bash
 npm run watch
 ```
 
 ### Lint
 ```bash
-npm run lint
-npm run lint:fix  # Auto-fix issues
+npm run lint          # Check for issues
+npm run lint:fix      # Auto-fix issues
 ```
 
 ### Test
-1. Press `F5` in VS Code to open Extension Development Host
-2. Test the commands in the new window
+Press `F5` in VS Code to launch Extension Development Host
 
-### Publish
+## 📦 How It Works
+
+This extension wraps these git commands:
+
 ```bash
-vsce publish
+# Quick commit:
+git init                          # If needed
+git commit --allow-empty -m "Empty commit"
+
+# With git config:
+git init                          # If needed
+git config user.name "Your Name"
+git config user.email "email@example.com"
+git commit --allow-empty -m "Your message"
 ```
 
-## 📦 Project Structure
-
-```
-├── src/
-│   └── extension.ts       # Main extension code
-├── package.json           # Extension manifest
-├── tsconfig.json          # TypeScript config
-├── .eslintrc.json         # Linting rules
-├── .gitignore             # Git ignore patterns
-├── .vscodeignore          # Package ignore patterns
-└── README.md              # This file
-```
+All done safely with proper error handling and input validation.
 
 ## 📄 License
 
-MIT License — feel free to use and modify!
+MIT License - Use freely!
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to:
-- Report bugs via GitHub Issues
-- Suggest features
-- Submit pull requests
+Found an issue or have an idea? Open an issue on [GitHub](https://github.com/Ed-bb/vscode-empty-commit-extension)
 
 ## 🔐 Security
 
-This extension uses secure argument passing to git commands to prevent shell injection vulnerabilities. All user input is properly validated.
-
-## 📞 Support
-
-For issues, questions, or feature requests, please open an issue on the [GitHub repository](https://github.com/Ed-bb/vscode-empty-commit-extension).
+- Uses safe argument passing (no shell injection vulnerabilities)
+- Validates all user input
+- Sanitizes error messages
 
 ---
 
-**Happy committing!** 🎉
+**The simplest way to initialize a repo after forking.** 🚀
